@@ -30,6 +30,42 @@ function viewcounter_get_view_count() {
 
    return $current_views;
 }
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+if ( is_plugin_active( 'nichlasdam_viewcounter/nichlasdam_viewcounter.php' ) ) {
+
+add_action ('init', 'create_post_type');
+function getPostViews($postID){
+    $count_key = 'viewcounter_views';
+    $count = get_post_meta($postID, $count_key, true);
+    if($count==''){
+        delete_post_meta($postID, $count_key);
+        add_post_meta($postID, $count_key, '0');
+        return "0 View";
+    }
+    return $count.' Views';
+}
+function setPostViews($postID) {
+    $count_key = 'viewcounter_views';
+    $count = get_post_meta($postID, $count_key, true);
+    if($count==''){
+        $count = 0;
+        delete_post_meta($postID, $count_key);
+        add_post_meta($postID, $count_key, '0');
+    }else{
+        $count++;
+        update_post_meta($postID, $count_key, $count);
+    }
+}
+}
+    
+add_filter( 'the_content', 'viewcounter_filter');
+
+function viewcounter_filter( $content ) {
+
+    if ( is_single() )
+            echo "Visninger: " . viewcounter_get_view_count();
+    return $content;
+}
 
 
 ?>
